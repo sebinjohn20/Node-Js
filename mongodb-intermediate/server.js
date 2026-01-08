@@ -3,6 +3,7 @@ const express = require("express");
 
 const connectToDB = require("./Database/db");
 const productRoutes = require("./Routes/products-routes");
+const bookRoutes = require("./Routes/book-routes");
 
 const app = express();
 
@@ -14,6 +15,7 @@ connectToDB();
 
 // routes
 app.use("/products", productRoutes);
+app.use("/refernce", bookRoutes);
 
 const PORT = process.env.PORT || 4000;
 

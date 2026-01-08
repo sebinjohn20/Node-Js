@@ -7,6 +7,7 @@ const {
   getProductCategory,
   getProductAnalysis,
 } = require("../Controllers/product-controller");
+const { listIndexes } = require("../Model/Product");
 
 router.post("/add", insertSampleProducts);
 router.post("/stats", getProductStats);
@@ -14,3 +15,4 @@ router.post("/category", getProductCategory);
 router.post("/analysis", getProductAnalysis);
 
 module.exports = router;
+//

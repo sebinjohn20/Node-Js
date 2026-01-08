@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="user-list">
+      <h3>Online Users</h3>
+      <ul id="users"></ul>
+    </div>
+    <div id="chat"></div>
+    <div id="typing-indicator"></div>
+
+    <form action="" id="message-form">
+      <input
+        type="text"
+        id="message-input"
+        placeholder="Enter the message"
+        required
+      />
+      <button type="submit">Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const chat = document.getElementById("chat");
+      const userList = document.getElementById("users");
+      const messageFrom = document.getElementById("message-form");
+      const messageInput = document.getElementById("message-input");
+      const typingDiv = document.getElementById("typing-indicator");
+
+      const userName = prompt("Enter your username");
+      socket.emit("join", userName);
+      socket.on("userJoined", (user) => {
+        addMessage(`${user} has join the chat`);
+      });
+      socket.on("userLeft", (user) => {
+        addMessage(`${user} has the chat`);
+      });
+      socket.on("userList", (users) => {
+        userList.innerHTML = users.map((user) => `<li>${user}</li>`);
+      });
+      // Listen for chatMessage events from the server
+
+      socket.on("chatMessage", (message) => {
+        addMessage(`${message.userName}:${message.text}`);
+      });
+      messageInput.addEventListener("input", () => {
+        socket.emit("typing", userName);
+      });
+      let typingTimeout;
+
+      socket.on("typing", (user) => {
+        typingDiv.textContent = `${user} is typing...`;
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          typingDiv.textContent = "";
+        }, 2000);
+      });
+      // handle form submission
+      messageFrom.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const extractMessageText = messageInput.value.trim();
+        if (extractMessageText) {
+          socket.emit("chatMessage", {
+            userName,
+            text: extractMessageText,
+          });
+          messageInput.value = "";
+        }
+      });
+
+      function addMessage(input) {
+        const messageElement = document.createElement("div");
+        messageElement.textContent = input;
+        chat.appendChild(messageElement);
+        //scroll to the bottom of the chat container
+        chat.scrollTop = chat.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
