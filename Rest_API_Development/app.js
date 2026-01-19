@@ -33,7 +33,6 @@ app.get("/get/:id", (req, res) => {
 app.post("/add", (req, res) => {
   const newBook = {
     id: Math.floor(Math.random() * 1000).toString(),
-    tittle: `Book ${Math.floor(Math.random() * 1000)}`,
   };
   books.push(newBook);
   res.status(200).json({
